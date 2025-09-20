@@ -123,6 +123,27 @@ h1 {
     left: -60%;
     z-index: 1;
   }
+  h1,
+  .mcap,
+  .x-link {
+    transform: rotate(90deg);
+    transform-origin: top left;
+  }
+
+  h1 {
+    top: 20px;
+    left: 20px;
+  }
+
+  .mcap {
+    top: 70px;
+    left: 20px;
+  }
+
+  .x-link {
+    top: 20px;
+    right: 20px;
+  }
 }
 
 @keyframes spin {
