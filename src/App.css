@@ -33,7 +33,7 @@ h1 {
   font-weight: 600;
   transition: color 0.3s ease;
   position: absolute;
-  top: 60px; /* Below h1 */
+  top: 70px; /* Below h1 */
   left: 20px;
   z-index: 10; /* Above video */
   margin: 0;
