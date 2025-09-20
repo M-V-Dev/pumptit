@@ -114,8 +114,8 @@ h1 {
 /* Slight adjustments for smaller screens */
 @media (max-width: 768px) {
   .mcap-video {
-    width: 110vh;           /* Swap width/height for rotation */
-    height: 110vw;
+    width: 120vh;           /* Swap width/height for rotation */
+    height: 120vw;
     transform: rotate(90deg);
     transform-origin: center center; /* Rotate around center */
     position: fixed;
