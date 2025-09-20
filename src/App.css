@@ -133,12 +133,12 @@ h1 {
   h1 {
     top: 20px;
     left: 400px;
-    font-size: 1rem;
+    font-size: 1.5rem;
   }
 
   .mcap {
     top: 20px;
-    right: -100px;
+    left: 300px;
   }
 
   .x-link {
