@@ -116,7 +116,7 @@ h1 {
   .mcap-video {
 
     width: 100vw;  /* a little wider to cover edges on mobile */
-    height: 110vh; /* a little taller for phones */
+    height: 200vh; /* a little taller for phones */
     transform: rotate(90deg);
     transform-origin: center center;
     object-fit: cover;
