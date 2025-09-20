@@ -132,16 +132,16 @@ h1 {
 
   h1 {
     top: 20px;
-    right: 20px;
+    right: -200px;
   }
 
   .mcap {
-    top: 100px;
-    right: 20px;
+    top: 20px;
+    right: -100px;
   }
 
   .x-link {
-    top: 100px;
+    top: 20px;
     left: 50px;
   }
 }
