@@ -1,5 +1,5 @@
 body {
-  background-color: #4B1E3B; /* Cool dark pink */
+  background-color: #000000; /* Cool dark pink */
   color: #e0e0e0;
   margin: 0;
   font-family: 'Arial', sans-serif;
@@ -114,8 +114,8 @@ h1 {
 /* Slight adjustments for smaller screens */
 @media (max-width: 768px) {
   .mcap-video {
-    width: 120vh;           /* Swap width/height for rotation */
-    height: 120vw;
+    width: 115vh;           /* Swap width/height for rotation */
+    height: 115vw;
     transform: rotate(90deg);
     transform-origin: center center; /* Rotate around center */
     position: fixed;
