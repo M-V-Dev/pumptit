@@ -114,6 +114,7 @@ h1 {
 /* Adjust for mobile */
 @media (max-width: 768px) {
   .mcap-video {
+    padding-top: 50px;
     width: 120%;   /* Slightly larger for small screens */
     height: auto;
     max-height: 120vh;
