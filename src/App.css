@@ -128,6 +128,7 @@ h1 {
   .x-link {
     transform: rotate(90deg);
     transform-origin: top left;
+    white-space: nowrap; 
   }
 
   h1 {
