@@ -114,10 +114,12 @@ h1 {
 /* Slight adjustments for smaller screens */
 @media (max-width: 768px) {
   .mcap-video {
+
     width: 110vw;  /* a little wider to cover edges on mobile */
     height: 110vh; /* a little taller for phones */
+    transform: rotate(90deg);
+    transform-origin: center center;
     object-fit: cover;
-    rotate: 90;
   }
 
 @keyframes spin {
