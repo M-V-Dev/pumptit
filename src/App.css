@@ -114,8 +114,8 @@ h1 {
 /* Slight adjustments for smaller screens */
 @media (max-width: 768px) {
   .mcap-video {
-    width: 100vw;  /* a little wider to cover edges on mobile */
-    height: 100vh; /* a little taller for phones */
+    width: 50vw;  /* a little wider to cover edges on mobile */
+    height: 50vh; /* a little taller for phones */
     object-fit: cover;
   }
 
