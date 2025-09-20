@@ -111,13 +111,16 @@ h1 {
   padding: 0;
 }
 
-/* Slight adjustments for smaller screens */
+/* Adjust for mobile */
 @media (max-width: 768px) {
   .mcap-video {
-    width: 50vw;  /* a little wider to cover edges on mobile */
-    height: 50vh; /* a little taller for phones */
-    object-fit: cover;
+    width: 120%;   /* Slightly larger for small screens */
+    height: auto;
+    max-height: 120vh;
+    left: -10%;    /* Center the video horizontally */
+    top: -10%;     /* Center vertically if taller than viewport */
   }
+}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
