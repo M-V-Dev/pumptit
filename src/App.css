@@ -119,8 +119,8 @@ h1 {
     transform: rotate(90deg);
     transform-origin: center center; /* Rotate around center */
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 20%;
+    left: -15%;
     z-index: 1;
   }
 }
