@@ -137,11 +137,11 @@ h1 {
 
   .mcap {
     top: 100px;
-    right: 100px;
+    right: 20px;
   }
 
   .x-link {
-    top: 50px;
+    top: 100px;
     left: 50px;
   }
 }
