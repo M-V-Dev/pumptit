@@ -78,7 +78,7 @@ function App() {
       >
         <img src="https://abs.twimg.com/favicons/twitter.2.ico" alt="X Logo" />
       </a>
-      <h1>PUMP THE TITS!</h1>
+      <h1>PUMP MY TITS!</h1>
       {error && <p className="error">{error}</p>}
       {loading ? (
         <div className="spinner">Loading...</div>
