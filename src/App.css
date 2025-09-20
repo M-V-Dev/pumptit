@@ -120,7 +120,7 @@ h1 {
     transform: rotate(90deg);
     transform-origin: center center;
     object-fit: cover;
-  }
+  }}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
