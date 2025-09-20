@@ -114,13 +114,16 @@ h1 {
 /* Slight adjustments for smaller screens */
 @media (max-width: 768px) {
   .mcap-video {
-
-    width: 100vw;  /* a little wider to cover edges on mobile */
-    height: 50vh; /* a little taller for phones */
+    width: 110vh;           /* Swap width/height for rotation */
+    height: 110vw;
     transform: rotate(90deg);
-    transform-origin: center center;
-    object-fit: cover;
-  }}
+    transform-origin: center center; /* Rotate around center */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
