@@ -10,7 +10,6 @@ function App() {
   const videoRef = useRef(null);
   const maxMcap = 500_000; // max cap threshold
   const lastVideoTimeRef = useRef(0);
-  const animationRef = useRef(null);
 
   const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
@@ -26,7 +25,6 @@ function App() {
       // dynamic threshold: 1k below 100k, 3k otherwise
       const threshold = newMcap < 100_000 ? 1000 : 3000;
 
-      // only act if change passes threshold
       if (Math.abs(newMcap - lastMcapRef.current) >= threshold) {
         setDirection(newMcap > lastMcapRef.current ? 'up' : 'down');
 
@@ -34,16 +32,16 @@ function App() {
           let targetTime;
 
           if (newMcap >= maxMcap) {
-            // 🔒 lock at final loop segment once
+            // lock at final loop segment, only once
             if (lastMcapRef.current < maxMcap) {
               targetTime = videoRef.current.duration - 3;
-              animateVideo(videoRef.current.currentTime, targetTime, 600);
+              videoRef.current.currentTime = targetTime;
               lastVideoTimeRef.current = targetTime;
             }
           } else {
             // map proportionally to MCAP
             targetTime = (newMcap / maxMcap) * videoRef.current.duration;
-            animateVideo(videoRef.current.currentTime, targetTime, 600);
+            videoRef.current.currentTime = targetTime;
             lastVideoTimeRef.current = targetTime;
           }
         }
@@ -86,27 +84,6 @@ function App() {
     }, 50);
     return () => clearInterval(loopInterval);
   }, [mcap]);
-
-  // Smooth animate between two positions
-  const animateVideo = (from, to, duration) => {
-    if (animationRef.current) cancelAnimationFrame(animationRef.current);
-    const start = performance.now();
-
-    const step = (now) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-
-      if (videoRef.current) {
-        videoRef.current.currentTime = from + (to - from) * progress;
-      }
-
-      if (progress < 1) {
-        animationRef.current = requestAnimationFrame(step);
-      }
-    };
-
-    animationRef.current = requestAnimationFrame(step);
-  };
 
   return (
     <div className="App">
