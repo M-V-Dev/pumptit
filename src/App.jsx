@@ -4,25 +4,24 @@ import './App.css';
 function App() {
   const [mcap, setMcap] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [direction, setDirection] = useState(null); // 'up' or 'down'
+  const [direction, setDirection] = useState(null);
   const lastMcapRef = useRef(0);
   const lastFetchRef = useRef(0);
   const videoRef = useRef(null);
-  const maxMcap = 500_000; // max cap threshold
+  const maxMcap = 500_000;
   const lastVideoTimeRef = useRef(0);
 
   const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
   const fetchMcap = async () => {
     const now = Date.now();
-    if (now - lastFetchRef.current < 500) return; // debounce 500ms
+    if (now - lastFetchRef.current < 500) return;
 
     try {
       const res = await fetch(`${API_BASE}/api/mcap`);
       const data = await res.json();
       const newMcap = data.mcap || 0;
 
-      // dynamic threshold: 1k below 100k, 3k otherwise
       const threshold = newMcap < 100_000 ? 1000 : 3000;
 
       if (Math.abs(newMcap - lastMcapRef.current) >= threshold) {
@@ -34,17 +33,17 @@ function App() {
           if (newMcap >= maxMcap) {
             // lock into final 3-second segment
             targetTime = videoRef.current.duration - 3;
+            lastVideoTimeRef.current = targetTime; // keep it locked
           } else {
-            // proportional mapping
-            targetTime = (newMcap / maxMcap) * videoRef.current.duration;
+            // map proportionally, but don't exceed duration-3 to avoid overlap
+            targetTime = Math.min(
+              (newMcap / maxMcap) * videoRef.current.duration,
+              videoRef.current.duration - 3
+            );
+            lastVideoTimeRef.current = targetTime;
           }
 
           videoRef.current.currentTime = targetTime;
-
-          // reset lastVideoTimeRef if we're below maxMcap
-          if (newMcap < maxMcap) {
-            lastVideoTimeRef.current = targetTime;
-          }
         }
 
         lastMcapRef.current = newMcap;
@@ -66,20 +65,22 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Loop segment (2s normally, 3s if above max cap)
+  // Loop segment
   useEffect(() => {
     const loopInterval = setInterval(() => {
-      if (videoRef.current) {
-        if (mcap >= maxMcap) {
-          const startTime = videoRef.current.duration - 3;
-          if (videoRef.current.currentTime >= videoRef.current.duration) {
-            videoRef.current.currentTime = startTime;
-          }
-        } else {
-          const startTime = lastVideoTimeRef.current;
-          if (videoRef.current.currentTime >= startTime + 2) {
-            videoRef.current.currentTime = startTime;
-          }
+      if (!videoRef.current) return;
+
+      if (mcap >= maxMcap) {
+        const startTime = videoRef.current.duration - 3;
+        if (videoRef.current.currentTime >= videoRef.current.duration) {
+          videoRef.current.currentTime = startTime;
+        }
+      } else {
+        const startTime = lastVideoTimeRef.current;
+        // ensure we don't overlap the final 3s
+        const loopEnd = Math.min(startTime + 2, videoRef.current.duration - 3);
+        if (videoRef.current.currentTime >= loopEnd) {
+          videoRef.current.currentTime = startTime;
         }
       }
     }, 50);
@@ -115,7 +116,7 @@ function App() {
         ref={videoRef}
         src="/video.mp4"
         autoPlay
-        loop={false} // handled manually
+        loop={false}
         muted
         playsInline
         className="mcap-video"
