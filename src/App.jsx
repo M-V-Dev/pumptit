@@ -32,7 +32,7 @@ function App() {
           let targetTime;
 
           if (newMcap >= maxMcap) {
-            // always lock into final loop segment
+            // lock into final 3-second segment
             targetTime = videoRef.current.duration - 3;
           } else {
             // proportional mapping
@@ -40,7 +40,11 @@ function App() {
           }
 
           videoRef.current.currentTime = targetTime;
-          lastVideoTimeRef.current = targetTime;
+
+          // reset lastVideoTimeRef if we're below maxMcap
+          if (newMcap < maxMcap) {
+            lastVideoTimeRef.current = targetTime;
+          }
         }
 
         lastMcapRef.current = newMcap;
