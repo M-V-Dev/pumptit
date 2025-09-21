@@ -8,30 +8,36 @@ function App() {
   const lastMcapRef = useRef(0);
   const lastFetchRef = useRef(0);
   const videoRef = useRef(null);
-  const maxMcap = 800_000; // $1,000,000
+  const maxMcap = 800_000; // max cap threshold
   const lastVideoTimeRef = useRef(0);
+  const animationRef = useRef(null);
 
   const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
   const fetchMcap = async () => {
     const now = Date.now();
-    if (now - lastFetchRef.current < 500) return; // Debounce 500ms
+    if (now - lastFetchRef.current < 500) return; // debounce 500ms
+
     try {
       const res = await fetch(`${API_BASE}/api/mcap`);
       const data = await res.json();
       const newMcap = data.mcap || 0;
 
-      // Only update if change >= 1000
       if (Math.abs(newMcap - lastMcapRef.current) >= 1000) {
-        setDirection(
-          newMcap > lastMcapRef.current ? 'up' : 'down'
-        );
+        setDirection(newMcap > lastMcapRef.current ? 'up' : 'down');
 
-        // Update video position based on new MCAP
         if (videoRef.current && videoRef.current.duration) {
-          const videoTime = (newMcap / maxMcap) * videoRef.current.duration;
-          videoRef.current.currentTime = videoTime;
-          lastVideoTimeRef.current = videoTime;
+          let targetTime;
+
+          if (newMcap >= maxMcap) {
+            // lock into final loop segment
+            targetTime = videoRef.current.duration - 3;
+          } else {
+            targetTime = (newMcap / maxMcap) * videoRef.current.duration;
+          }
+
+          animateVideo(videoRef.current.currentTime, targetTime, 600);
+          lastVideoTimeRef.current = targetTime;
         }
 
         lastMcapRef.current = newMcap;
@@ -53,18 +59,46 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Loop video in 2-second segments
+  // Loop segment (2s normally, 3s if above max cap)
   useEffect(() => {
     const loopInterval = setInterval(() => {
       if (videoRef.current) {
-        const startTime = lastVideoTimeRef.current;
-        if (videoRef.current.currentTime >= startTime + 2) {
-          videoRef.current.currentTime = startTime;
+        if (mcap >= maxMcap) {
+          const startTime = videoRef.current.duration - 3;
+          if (videoRef.current.currentTime >= videoRef.current.duration) {
+            videoRef.current.currentTime = startTime;
+          }
+        } else {
+          const startTime = lastVideoTimeRef.current;
+          if (videoRef.current.currentTime >= startTime + 2) {
+            videoRef.current.currentTime = startTime;
+          }
         }
       }
-    }, 50); // check every 50ms
+    }, 50);
     return () => clearInterval(loopInterval);
-  }, []);
+  }, [mcap]);
+
+  // Smooth animate between two positions
+  const animateVideo = (from, to, duration) => {
+    if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    const start = performance.now();
+
+    const step = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+
+      if (videoRef.current) {
+        videoRef.current.currentTime = from + (to - from) * progress;
+      }
+
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(step);
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(step);
+  };
 
   return (
     <div className="App">
@@ -84,7 +118,8 @@ function App() {
           <span className="arrow">
             {direction === 'up' ? '↑' : direction === 'down' ? '↓' : ''}
           </span>
-          ${mcap.toLocaleString('en-US', {
+          $
+          {mcap.toLocaleString('en-US', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
           })}
@@ -94,7 +129,7 @@ function App() {
         ref={videoRef}
         src="/video.mp4"
         autoPlay
-        loop={false} // loop handled manually
+        loop={false} // handled manually
         muted
         playsInline
         className="mcap-video"
