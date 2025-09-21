@@ -10,7 +10,7 @@ function App() {
   const lastMcapRef = useRef(0);
   const lastFetchRef = useRef(0);
   const videoRef = useRef(null);
-  const maxMcap = 500_000; // max cap threshold
+  const maxMcap = 600_000; // max cap threshold
   const lastVideoTimeRef = useRef(0);
 
   let flashInterval = useRef(null);
