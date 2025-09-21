@@ -23,7 +23,10 @@ function App() {
       const data = await res.json();
       const newMcap = data.mcap || 0;
 
-      if (Math.abs(newMcap - lastMcapRef.current) >= 1000) {
+      // dynamic threshold
+      const threshold = newMcap >= 100_000 ? 3000 : 1000;
+
+      if (Math.abs(newMcap - lastMcapRef.current) >= threshold) {
         setDirection(newMcap > lastMcapRef.current ? 'up' : 'down');
 
         if (videoRef.current && videoRef.current.duration) {
