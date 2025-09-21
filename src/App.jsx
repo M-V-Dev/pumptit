@@ -4,7 +4,8 @@ import './App.css';
 function App() {
   const [mcap, setMcap] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [direction, setDirection] = useState(null);
+  const [direction, setDirection] = useState(null); // 'up' or 'down'
+  const [showBigger, setShowBigger] = useState(false);
   const lastMcapRef = useRef(0);
   const lastFetchRef = useRef(0);
   const videoRef = useRef(null);
@@ -31,11 +32,9 @@ function App() {
           let targetTime;
 
           if (newMcap >= maxMcap) {
-            // lock into final 3-second segment
             targetTime = videoRef.current.duration - 3;
-            lastVideoTimeRef.current = targetTime; // keep it locked
+            lastVideoTimeRef.current = targetTime;
           } else {
-            // map proportionally, but don't exceed duration-3 to avoid overlap
             targetTime = Math.min(
               (newMcap / maxMcap) * videoRef.current.duration,
               videoRef.current.duration - 3
@@ -65,26 +64,49 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Loop segment
+  // Loop segment and trigger "BIGGER" flash
   useEffect(() => {
+    let flashInterval = null;
+
     const loopInterval = setInterval(() => {
       if (!videoRef.current) return;
 
+      const videoDuration = videoRef.current.duration;
+
       if (mcap >= maxMcap) {
-        const startTime = videoRef.current.duration - 3;
-        if (videoRef.current.currentTime >= videoRef.current.duration) {
+        const startTime = videoDuration - 3;
+        if (videoRef.current.currentTime >= videoDuration) {
           videoRef.current.currentTime = startTime;
         }
+        setShowBigger(false); // hide BIGGER once max reached
       } else {
         const startTime = lastVideoTimeRef.current;
-        // ensure we don't overlap the final 3s
-        const loopEnd = Math.min(startTime + 2, videoRef.current.duration - 3);
+        const loopEnd = Math.min(startTime + 2, videoDuration - 3);
         if (videoRef.current.currentTime >= loopEnd) {
           videoRef.current.currentTime = startTime;
         }
+
+        // Show BIGGER if within last 3 seconds before max
+        if (mcap >= maxMcap - 5000) { // 5k buffer before max
+          if (!flashInterval) {
+            flashInterval = setInterval(() => {
+              setShowBigger((prev) => !prev);
+            }, 500);
+          }
+        } else {
+          setShowBigger(false);
+          if (flashInterval) {
+            clearInterval(flashInterval);
+            flashInterval = null;
+          }
+        }
       }
     }, 50);
-    return () => clearInterval(loopInterval);
+
+    return () => {
+      clearInterval(loopInterval);
+      if (flashInterval) clearInterval(flashInterval);
+    };
   }, [mcap]);
 
   return (
@@ -98,6 +120,7 @@ function App() {
         <img src="https://abs.twimg.com/favicons/twitter.2.ico" alt="X Logo" />
       </a>
       <h1>PUMP MY TITS!</h1>
+      {showBigger && <h2 className="bigger-text">BIGGER</h2>}
       {loading ? (
         <div className="spinner">Loading...</div>
       ) : (
