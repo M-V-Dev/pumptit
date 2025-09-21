@@ -23,9 +23,10 @@ function App() {
       const data = await res.json();
       const newMcap = data.mcap || 0;
 
-      // dynamic threshold
-      const threshold = newMcap >= 100_000 ? 3000 : 1000;
+      // dynamic threshold: 1k below 100k, 3k otherwise
+      const threshold = newMcap < 100_000 ? 1000 : 3000;
 
+      // only act if change passes threshold
       if (Math.abs(newMcap - lastMcapRef.current) >= threshold) {
         setDirection(newMcap > lastMcapRef.current ? 'up' : 'down');
 
@@ -33,14 +34,18 @@ function App() {
           let targetTime;
 
           if (newMcap >= maxMcap) {
-            // lock into final loop segment
-            targetTime = videoRef.current.duration - 3;
+            // 🔒 lock at final loop segment once
+            if (lastMcapRef.current < maxMcap) {
+              targetTime = videoRef.current.duration - 3;
+              animateVideo(videoRef.current.currentTime, targetTime, 600);
+              lastVideoTimeRef.current = targetTime;
+            }
           } else {
+            // map proportionally to MCAP
             targetTime = (newMcap / maxMcap) * videoRef.current.duration;
+            animateVideo(videoRef.current.currentTime, targetTime, 600);
+            lastVideoTimeRef.current = targetTime;
           }
-
-          animateVideo(videoRef.current.currentTime, targetTime, 600);
-          lastVideoTimeRef.current = targetTime;
         }
 
         lastMcapRef.current = newMcap;
