@@ -4,30 +4,25 @@ import './App.css';
 function App() {
   const [mcap, setMcap] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [direction, setDirection] = useState(null); // 'up' or 'down'
-  const [showBigger, setShowBigger] = useState(false);
-
+  const [direction, setDirection] = useState(null);
   const lastMcapRef = useRef(0);
   const lastFetchRef = useRef(0);
   const videoRef = useRef(null);
-  const maxMcap = 550_000; // max cap threshold
+  const maxMcap = 500_000;
   const lastVideoTimeRef = useRef(0);
-
-  let flashInterval = useRef(null);
 
   const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
   const fetchMcap = async () => {
     const now = Date.now();
-    if (now - lastFetchRef.current < 500) return; // debounce 500ms
+    if (now - lastFetchRef.current < 500) return;
 
     try {
       const res = await fetch(`${API_BASE}/api/mcap`);
       const data = await res.json();
       const newMcap = data.mcap || 0;
 
-      // dynamic threshold
-      const threshold = newMcap >= 100_000 ? 3000 : 1000;
+      const threshold = newMcap < 100_000 ? 1000 : 3000;
 
       if (Math.abs(newMcap - lastMcapRef.current) >= threshold) {
         setDirection(newMcap > lastMcapRef.current ? 'up' : 'down');
@@ -36,14 +31,19 @@ function App() {
           let targetTime;
 
           if (newMcap >= maxMcap) {
-            // lock into final loop segment
+            // lock into final 3-second segment
             targetTime = videoRef.current.duration - 3;
+            lastVideoTimeRef.current = targetTime; // keep it locked
           } else {
-            targetTime = (newMcap / maxMcap) * videoRef.current.duration;
+            // map proportionally, but don't exceed duration-3 to avoid overlap
+            targetTime = Math.min(
+              (newMcap / maxMcap) * videoRef.current.duration,
+              videoRef.current.duration - 3
+            );
+            lastVideoTimeRef.current = targetTime;
           }
 
           videoRef.current.currentTime = targetTime;
-          lastVideoTimeRef.current = targetTime;
         }
 
         lastMcapRef.current = newMcap;
@@ -51,22 +51,6 @@ function App() {
 
       setMcap(newMcap);
       lastFetchRef.current = now;
-
-      // FLASH "BIGGER" logic
-      if (newMcap >= maxMcap - 5000 && newMcap < maxMcap) {
-        if (!flashInterval.current) {
-          flashInterval.current = setInterval(() => {
-            setShowBigger(prev => !prev);
-          }, 500);
-        }
-      } else {
-        setShowBigger(false);
-        if (flashInterval.current) {
-          clearInterval(flashInterval.current);
-          flashInterval.current = null;
-        }
-      }
-
     } catch (err) {
       console.error('Fetch MCAP error:', err);
     } finally {
@@ -78,26 +62,25 @@ function App() {
   useEffect(() => {
     fetchMcap();
     const interval = setInterval(fetchMcap, 1000);
-    return () => {
-      clearInterval(interval);
-      if (flashInterval.current) clearInterval(flashInterval.current);
-    };
+    return () => clearInterval(interval);
   }, []);
 
-  // Loop segment (2s normally, 3s if above max cap)
+  // Loop segment
   useEffect(() => {
     const loopInterval = setInterval(() => {
-      if (videoRef.current) {
-        if (mcap >= maxMcap) {
-          const startTime = videoRef.current.duration - 3;
-          if (videoRef.current.currentTime >= videoRef.current.duration) {
-            videoRef.current.currentTime = startTime;
-          }
-        } else {
-          const startTime = lastVideoTimeRef.current;
-          if (videoRef.current.currentTime >= startTime + 2) {
-            videoRef.current.currentTime = startTime;
-          }
+      if (!videoRef.current) return;
+
+      if (mcap >= maxMcap) {
+        const startTime = videoRef.current.duration - 3;
+        if (videoRef.current.currentTime >= videoRef.current.duration) {
+          videoRef.current.currentTime = startTime;
+        }
+      } else {
+        const startTime = lastVideoTimeRef.current;
+        // ensure we don't overlap the final 3s
+        const loopEnd = Math.min(startTime + 2, videoRef.current.duration - 3);
+        if (videoRef.current.currentTime >= loopEnd) {
+          videoRef.current.currentTime = startTime;
         }
       }
     }, 50);
@@ -115,7 +98,6 @@ function App() {
         <img src="https://abs.twimg.com/favicons/twitter.2.ico" alt="X Logo" />
       </a>
       <h1>PUMP MY TITS!</h1>
-      {showBigger && <h2 className="bigger-text">BIGGER</h2>}
       {loading ? (
         <div className="spinner">Loading...</div>
       ) : (
@@ -123,7 +105,8 @@ function App() {
           <span className="arrow">
             {direction === 'up' ? '↑' : direction === 'down' ? '↓' : ''}
           </span>
-          ${mcap.toLocaleString('en-US', {
+          $
+          {mcap.toLocaleString('en-US', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
           })}
@@ -133,7 +116,7 @@ function App() {
         ref={videoRef}
         src="/video.mp4"
         autoPlay
-        loop={false} // handled manually
+        loop={false}
         muted
         playsInline
         className="mcap-video"
