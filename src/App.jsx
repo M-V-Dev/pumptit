@@ -8,7 +8,7 @@ function App() {
   const lastMcapRef = useRef(0);
   const lastFetchRef = useRef(0);
   const videoRef = useRef(null);
-  const maxMcap = 500_000; // $1,000,000
+  const maxMcap = 800_000; // $1,000,000
   const lastVideoTimeRef = useRef(0);
 
   const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
