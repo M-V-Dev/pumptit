@@ -88,7 +88,7 @@ h1 {
 }
 
 /* Mobile (<768px) adjustments */
-@media (max-width: 700) {
+@media (max-width: 568px) {
   .mcap-video {
     width: 120vh;
     height: 120vw;
