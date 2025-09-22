@@ -31,11 +31,9 @@ function App() {
           let targetTime;
 
           if (newMcap >= maxMcap) {
-            // lock into final 3-second segment
             targetTime = videoRef.current.duration - 3;
-            lastVideoTimeRef.current = targetTime; // keep it locked
+            lastVideoTimeRef.current = targetTime;
           } else {
-            // map proportionally, but don't exceed duration-3 to avoid overlap
             targetTime = Math.min(
               (newMcap / maxMcap) * videoRef.current.duration,
               videoRef.current.duration - 3
@@ -58,14 +56,12 @@ function App() {
     }
   };
 
-  // Poll every 1s
   useEffect(() => {
     fetchMcap();
     const interval = setInterval(fetchMcap, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // Loop segment
   useEffect(() => {
     const loopInterval = setInterval(() => {
       if (!videoRef.current) return;
@@ -77,7 +73,6 @@ function App() {
         }
       } else {
         const startTime = lastVideoTimeRef.current;
-        // ensure we don't overlap the final 3s
         const loopEnd = Math.min(startTime + 2, videoRef.current.duration - 3);
         if (videoRef.current.currentTime >= loopEnd) {
           videoRef.current.currentTime = startTime;
@@ -89,6 +84,7 @@ function App() {
 
   return (
     <div className="App">
+      {/* X link in top-right */}
       <a
         href="https://x.com"
         className="x-link"
@@ -97,21 +93,27 @@ function App() {
       >
         <img src="https://abs.twimg.com/favicons/twitter.2.ico" alt="X Logo" />
       </a>
-      <h1>PUMP MY TITS!</h1>
-      {loading ? (
-        <div className="spinner">Loading...</div>
-      ) : (
-        <p className={`mcap ${direction}`}>
-          <span className="arrow">
-            {direction === 'up' ? '↑' : direction === 'down' ? '↓' : ''}
-          </span>
-          $
-          {mcap.toLocaleString('en-US', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-          })}
-        </p>
-      )}
+
+      {/* Overlay with headline + mcap */}
+      <div className="overlay">
+        <h1>PUMP MY TITS!</h1>
+        {loading ? (
+          <div className="spinner">Loading...</div>
+        ) : (
+          <p className={`mcap ${direction}`}>
+            <span className="arrow">
+              {direction === 'up' ? '↑' : direction === 'down' ? '↓' : ''}
+            </span>
+            $
+            {mcap.toLocaleString('en-US', {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            })}
+          </p>
+        )}
+      </div>
+
+      {/* Background video */}
       <video
         ref={videoRef}
         src="/video.mp4"

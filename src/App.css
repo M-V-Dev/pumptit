@@ -3,7 +3,7 @@ body {
   color: #e0e0e0;
   margin: 0;
   font-family: 'Arial', sans-serif;
-  overflow: hidden; /* Prevent scrollbars when rotating */
+  overflow: hidden; /* prevent scrollbars */
 }
 
 .App {
@@ -11,23 +11,26 @@ body {
   min-height: 100vh;
   min-width: 100vw;
   display: flex;
-  flex-direction: column;
-  align-items: center; /* Center text horizontally */
-  justify-content: flex-start; /* Stick text to top */
   position: relative;
 }
 
-/* 🔥 Headline always scales with screen size */
+/* 🔥 Overlay for text */
+.overlay {
+  position: absolute;
+  top: 5vh;
+  left: 5vw;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  z-index: 10;
+}
+
 h1 {
   font-size: clamp(1.8rem, 4vw, 3rem);
   font-weight: bold;
   color: #ffffff;
   text-transform: uppercase;
-  margin: 0;
-  position: absolute;
-  top: 5vh; /* % of viewport height (scales better than px) */
-  left: 5vw;
-  z-index: 10;
+  margin: 0 0 1vh 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
@@ -35,19 +38,11 @@ h1 {
   font-size: clamp(1.5rem, 3vw, 2.5rem);
   font-weight: 600;
   transition: color 0.3s ease;
-  position: absolute;
-  top: 12vh; /* Keep consistent spacing below h1 */
-  left: 5vw;
-  z-index: 10;
   margin: 0;
 }
 
-.mcap.up {
-  color: #00ff00;
-}
-.mcap.down {
-  color: #ff0000;
-}
+.mcap.up { color: #00ff00; }
+.mcap.down { color: #ff0000; }
 
 .arrow {
   font-size: 1.5rem;
@@ -63,10 +58,7 @@ h1 {
   font-size: 1.5rem;
   color: #00b7ff;
   animation: spin 1s linear infinite;
-  position: absolute;
-  top: 12vh;
-  left: 5vw;
-  z-index: 10;
+  margin-top: 0.5rem;
 }
 
 .x-link {
@@ -82,7 +74,7 @@ h1 {
 }
 .x-link img:hover { opacity: 0.7; }
 
-/* 🎥 Video container fixes */
+/* 🎥 Video centered */
 .mcap-video {
   position: fixed;
   top: 50%;
@@ -90,29 +82,31 @@ h1 {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  transform: translate(-50%, -50%); /* Always center */
+  transform: translate(-50%, -50%);
   z-index: 1;
 }
 
 /* 📱 Mobile adjustments */
 @media (max-width: 768px) {
   .mcap-video {
-    width: 120vh; /* Slightly overshoot to cover edges */
+    width: 120vh;
     height: 120vw;
     transform: translate(-50%, -50%) rotate(90deg);
   }
 
-  h1,
-  .mcap,
-  .x-link {
+  .overlay {
+    top: 5vh;
+    left: 10vw;
     transform: rotate(90deg);
-    transform-origin: center center;
-    white-space: nowrap;
+    transform-origin: left top;
   }
 
-  h1 { top: 10vh; left: auto; }
-  .mcap { top: 20vh; left: auto; }
-  .x-link { top: 5vh; left: 5vw; }
+  .x-link {
+    top: 5vh;
+    left: 5vw;
+    transform: rotate(90deg);
+    transform-origin: left top;
+  }
 }
 
 @keyframes spin {
