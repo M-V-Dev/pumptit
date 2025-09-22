@@ -1,48 +1,50 @@
 body {
-  background-color: #000000; /* Cool dark pink */
+  background-color: #000000;
   color: #e0e0e0;
   margin: 0;
   font-family: 'Arial', sans-serif;
+  overflow: hidden; /* Prevent scrollbars when rotating */
 }
 
 .App {
-  background-color: #000000; /* Cool dark pink */
+  background-color: #000000;
   min-height: 100vh;
+  min-width: 100vw;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Align items to start for top-left text */
-  justify-content: flex-start;
-  position: relative; /* For absolute positioning of text and link */
+  align-items: center; /* Center text horizontally */
+  justify-content: flex-start; /* Stick text to top */
+  position: relative;
 }
 
+/* 🔥 Headline always scales with screen size */
 h1 {
-  font-size: 3rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
   font-weight: bold;
   color: #ffffff;
   text-transform: uppercase;
   margin: 0;
   position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 10; /* Above video */
+  top: 5vh; /* % of viewport height (scales better than px) */
+  left: 5vw;
+  z-index: 10;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .mcap {
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
   font-weight: 600;
   transition: color 0.3s ease;
   position: absolute;
-  top: 70px; /* Below h1 */
-  left: 20px;
-  z-index: 10; /* Above video */
+  top: 12vh; /* Keep consistent spacing below h1 */
+  left: 5vw;
+  z-index: 10;
   margin: 0;
 }
 
 .mcap.up {
   color: #00ff00;
 }
-
 .mcap.down {
   color: #ff0000;
 }
@@ -54,103 +56,66 @@ h1 {
   transition: transform 0.3s ease;
 }
 
-.mcap.up .arrow {
-  transform: translateY(-5px);
-}
-
-.mcap.down .arrow {
-  transform: translateY(5px);
-}
-
-.error {
-  color: #ff4444;
-  font-size: 1.2rem;
-  position: absolute;
-  top: 100px; /* Below mcap */
-  left: 20px;
-  z-index: 10; /* Above video */
-  margin: 0;
-}
+.mcap.up .arrow { transform: translateY(-5px); }
+.mcap.down .arrow { transform: translateY(5px); }
 
 .spinner {
   font-size: 1.5rem;
   color: #00b7ff;
   animation: spin 1s linear infinite;
   position: absolute;
-  top: 60px;
-  left: 20px;
-  z-index: 10; /* Above video */
+  top: 12vh;
+  left: 5vw;
+  z-index: 10;
 }
 
 .x-link {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 10; /* Above video */
+  top: 5vh;
+  right: 5vw;
+  z-index: 10;
 }
-
 .x-link img {
   width: 40px;
   height: 40px;
   transition: opacity 0.3s ease;
 }
+.x-link img:hover { opacity: 0.7; }
 
-.x-link img:hover {
-  opacity: 0.7; /* Hover effect */
-}
-
+/* 🎥 Video container fixes */
 .mcap-video {
+  position: fixed;
+  top: 50%;
+  left: 50%;
   width: 100vw;
   height: 100vh;
-  object-fit: cover; /* Cover entire viewport */
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1; /* Below text and link */
-  margin: 0;
-  padding: 0;
+  object-fit: cover;
+  transform: translate(-50%, -50%); /* Always center */
+  z-index: 1;
 }
 
-/* Slight adjustments for smaller screens */
+/* 📱 Mobile adjustments */
 @media (max-width: 768px) {
   .mcap-video {
-    width: 115vh;           /* Swap width/height for rotation */
-    height: 115vw;
-    transform: rotate(90deg);
-    transform-origin: center center; /* Rotate around center */
-    position: fixed;
-    top: 20%;
-    left: -60%;
-    z-index: 1;
+    width: 120vh; /* Slightly overshoot to cover edges */
+    height: 120vw;
+    transform: translate(-50%, -50%) rotate(90deg);
   }
+
   h1,
   .mcap,
   .x-link {
     transform: rotate(90deg);
-    transform-origin: top left;
-    white-space: nowrap; 
+    transform-origin: center center;
+    white-space: nowrap;
   }
 
-  h1 {
-    top: 20px;
-    left: 400px;
-    font-size: 2rem;
-  }
-
-  .mcap {
-    top: 20px;
-    left: 350px;
-    font-size: 2rem;
-  }
-
-  .x-link {
-    top: 20px;
-    left: 50px;
-  }
+  h1 { top: 10vh; left: auto; }
+  .mcap { top: 20vh; left: auto; }
+  .x-link { top: 5vh; left: 5vw; }
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
