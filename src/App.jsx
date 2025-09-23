@@ -96,7 +96,7 @@ function App() {
 
       {/* Overlay with headline + mcap */}
       <div className="overlay">
-        <h1>PUMP MY TITS!</h1>
+        <h1>PUMP MY BONKERS!</h1>
         {loading ? (
           <div className="spinner">Loading...</div>
         ) : (
