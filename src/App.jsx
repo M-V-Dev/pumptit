@@ -86,7 +86,7 @@ function App() {
     <div className="App">
       {/* X link in top-right */}
       <a
-        href="https://x.com/i/communities/1970515317651636432/"
+        href="https://x.com/i/communities/1970557600694665678/"
         className="x-link"
         target="_blank"
         rel="noopener noreferrer"
